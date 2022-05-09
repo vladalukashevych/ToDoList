@@ -1,0 +1,117 @@
+﻿@model ToDoList.WebApp.ViewModels.HomePageViewModel
+
+@{
+    Layout = null;
+}
+
+<form method="post" asp-action="Index">
+    <input type="text" asp-for="NewTask.Name" required/>
+    <input type="datetime" asp-for="NewTask.Deadline" />
+    <select asp-for="NewTask.CategoryId" asp-items="@(new SelectList(Model.Categories, nameof(Model.Category.Id), nameof(Model.Category.Name)))">
+    @*@if (Model.Categories != null)
+    {
+       @foreach (var category in Model.Categories)
+            {
+                <option value="@category.Id">@category.Name</option>
+            }
+    }*@
+    </select>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="submit" value="Add" />
+</form>
+
+<form asp-action="SortByCategory">
+    <select asp-for="Category.Id">
+    @if (Model.Categories != null)
+    {
+        @foreach (var category in Model.Categories)
+                {
+                    <option value="@category.Id">@category.Name</option>
+                }
+    }
+    </select>
+</form>
+
+<a asp-action="CreateCategory">Create Category</a>
+
+    <table>
+        <caption>Current</caption>
+        <thead>
+            <tr>
+                <th></th>
+                <th>Task</th>
+                <th>DeadLine</th>
+                <th>Category</th>
+                <th></th>
+            </tr>
+        </thead>
+    @if (Model.Tasks != null)
+    {
+        <tbody>
+                @foreach (var task in Model.Tasks)
+                {
+                    <tr>
+                        <td><input type="checkbox" />
+                            <input type="hidden" value="@task.Id"/></td>
+                        <td>@task.Name</td>
+                        <td @if(task.Deadline > DateTime.Now) { @("style=color:red; font-weight:700;") }>
+                            @task.Deadline                           
+                        </td>
+                        <td>
+                            @foreach (var category in Model.Categories)
+                            {
+                                if (task.CategoryId == category.Id)
+                                {
+                                    @category.Name
+                                }
+                            }
+                        </td>
+                        <td>
+                            @Html.ActionLink("Delete", "DeleteTask", new { id = task.Id }) 
+                        </td>
+                    </tr>
+                }
+        </tbody>         
+    }
+    </table> 
+    
+    <table>
+        <caption>Completed</caption>
+        <thead>
+            <tr>
+                <th></th>
+                <th>Task</th>
+                <th>Completed Time</th>
+                <th>Category</th>
+                <th></th>
+            </tr>
+        </thead>
+            @if (Model.CompletedTasks != null)
+            {
+        <tbody>
+            @foreach (var task in Model.CompletedTasks)
+            {
+                <tr>
+                    <td><input type="checkbox" />
+                        <input type="hidden" value="@task.Id"/></td>
+                    <td>@task.Name</td>
+                    <td>@task.CompletedTime</td>
+                    <td>
+                        @foreach (var category in Model.Categories)
+                        {
+                            if (task.CategoryId == category.Id)
+                            {
+                                @category.Name
+                            }
+                        }
+                    </td>
+                    <td>
+                        @Html.ActionLink("Delete", "DeleteTask", new { id = task.Id })
+                    </td>
+                </tr>
+            }
+        </tbody>
+        }
+    </table>
+
+
